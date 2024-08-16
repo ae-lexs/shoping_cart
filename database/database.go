@@ -17,7 +17,7 @@ var (
 )
 
 // Connects to the database and sets the DBInstance variable.
-func SetUpDabatabse() {
+func SetUpDatabase() {
 	dsn := fmt.Sprintf(
 		"host=postgres user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Asia/Shanghai",
 		os.Getenv("DB_USER"),
