@@ -1,28 +1,38 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"reflect"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	var greeting string
-	sourceIP := request.RequestContext.Identity.SourceIP
+var (
+	logger = log.Default()
+)
 
-	if sourceIP == "" {
-		greeting = "Hello, world!\n"
-	} else {
-		greeting = fmt.Sprintf("Hello, %s!\n", sourceIP)
+type Dependencies struct {
+	logger *log.Logger
+}
+
+// NewDependencies returns a Dependencies instance.
+func NewDependencies() *Dependencies {
+	return &Dependencies{
+		logger: logger,
 	}
+}
+
+func (d *Dependencies) handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	d.logger.Printf("Body: %s", request.Body)
+	d.logger.Printf("Body: %s", reflect.TypeOf(request.Body))
 
 	return events.APIGatewayProxyResponse{
-		Body:       greeting,
+		Body:       "OK",
 		StatusCode: 200,
 	}, nil
 }
 
 func main() {
-	lambda.Start(handler)
+	lambda.Start(NewDependencies().handler)
 }

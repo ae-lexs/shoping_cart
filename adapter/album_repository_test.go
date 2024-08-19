@@ -55,8 +55,8 @@ func TestCreateAlbumDBError(t *testing.T) {
 		expectedAlbum.Quantity,
 	)
 
-	if err != AlbumRespositoryCreateError {
-		t.Errorf("Expected error %v, but got %v", AlbumRespositoryCreateError, err)
+	if err != entity.AlbumRespositoryCreateError {
+		t.Errorf("Expected error %v, but got %v", entity.AlbumRespositoryCreateError, err)
 	}
 }
 

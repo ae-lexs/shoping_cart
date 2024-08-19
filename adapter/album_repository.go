@@ -1,7 +1,6 @@
 package adapter
 
 import (
-	"errors"
 	"log"
 
 	"github.com/ae-lexs/vinyl_store/entity"
@@ -12,9 +11,6 @@ import (
 type AlbumRespositoryInterface interface {
 	CreateAlbum(title, artist string, price float32, quantity int) (entity.Album, error)
 }
-
-// AlbumRespositoryCreateError represents a database exception.
-var AlbumRespositoryCreateError = errors.New("AlbumRespositoryCreate")
 
 // Respository represents the adapter for the Album table in PostgreSQL.
 type AlbumRespository struct {
@@ -43,7 +39,7 @@ func (r *AlbumRespository) CreateAlbum(title, artist string, price float32, quan
 	if result.Error != nil {
 		r.logger.Printf("AlbumRespositoryCreateError: %s", result.Error)
 
-		return entity.Album{}, AlbumRespositoryCreateError
+		return entity.Album{}, entity.AlbumRespositoryCreateError
 	}
 
 	return album, nil

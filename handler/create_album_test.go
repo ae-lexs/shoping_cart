@@ -4,7 +4,6 @@ import (
 	"log"
 	"testing"
 
-	"github.com/ae-lexs/vinyl_store/adapter"
 	"github.com/ae-lexs/vinyl_store/entity"
 )
 
@@ -61,7 +60,7 @@ func TestCreateAlbumHandler(t *testing.T) {
 			}`),
 			expectedResponse: Response{
 				ID:    0,
-				Error: InvalidJSONError,
+				Error: entity.InvalidJSONError,
 			},
 			expectedRepositoryError: nil,
 		},
@@ -83,7 +82,7 @@ func TestCreateAlbumHandler(t *testing.T) {
 				ID:    0,
 				Error: nil,
 			},
-			expectedRepositoryError: adapter.AlbumRespositoryCreateError,
+			expectedRepositoryError: entity.AlbumRespositoryCreateError,
 		},
 	}
 

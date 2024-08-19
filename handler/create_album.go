@@ -2,14 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 
 	"github.com/ae-lexs/vinyl_store/adapter"
+	"github.com/ae-lexs/vinyl_store/entity"
 )
-
-// InvalidJSONError represents a JSON parsing error
-var InvalidJSONError = errors.New("InvalidJSON")
 
 // AlbumData represents the received album information.
 type AlbumData struct {
@@ -48,7 +45,7 @@ func (h *CreateAlbumHandler) CreateAlbum(data []byte) Response {
 
 		return Response{
 			ID:    0,
-			Error: InvalidJSONError,
+			Error: entity.InvalidJSONError,
 		}
 	}
 
