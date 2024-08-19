@@ -7,6 +7,6 @@ type Album struct {
 	gorm.Model
 	Title    string
 	Artist   string
-	Price    float64
+	Price    float32
 	Quantity int
 }

@@ -8,8 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
+// AlbumRespositoryInterface represents the port for the AlbumRespository adapter.
+type AlbumRespositoryInterface interface {
+	CreateAlbum(title, artist string, price float32, quantity int) (entity.Album, error)
+}
+
 // AlbumRespositoryCreateError represents a database exception.
-var AlbumRespositoryCreateError = errors.New("AlbumRespositoryCreateError")
+var AlbumRespositoryCreateError = errors.New("AlbumRespositoryCreate")
 
 // Respository represents the adapter for the Album table in PostgreSQL.
 type AlbumRespository struct {
@@ -26,7 +31,7 @@ func NewAlbumRepository(db *gorm.DB, logger *log.Logger) *AlbumRespository {
 }
 
 // Creates an Album in the database.
-func (r *AlbumRespository) CreateAlbum(title, artist string, price float64, quantity int) (entity.Album, error) {
+func (r *AlbumRespository) CreateAlbum(title, artist string, price float32, quantity int) (entity.Album, error) {
 	album := entity.Album{
 		Title:    title,
 		Artist:   artist,
