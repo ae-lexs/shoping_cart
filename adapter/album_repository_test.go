@@ -3,6 +3,7 @@ package adapter
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -39,7 +40,7 @@ func TestCreateAlbumDBError(t *testing.T) {
 	sqlDB, db, mock := DbMock(t)
 	defer sqlDB.Close()
 
-	album_repository := NewAlbumRepository(db)
+	album_repository := NewAlbumRepository(db, log.Default())
 
 	mock.ExpectBegin()
 	mock.ExpectExec("INSERT INTO \"albums\" (.+) VALUES (.+)").WillReturnResult(
@@ -70,7 +71,7 @@ func TestCreateAlbumSuccessfully(t *testing.T) {
 
 	defer sqlDB.Close()
 
-	album_repository := NewAlbumRepository(db)
+	album_repository := NewAlbumRepository(db, log.Default())
 
 	addRow := sqlmock.NewRows([]string{"id"}).AddRow("1")
 	expectedSQL := "INSERT INTO \"albums\" (.+) VALUES (.+)"
