@@ -5,19 +5,18 @@ import (
 	"log"
 	"os"
 
-	"github.com/ae-lexs/vinyl_store/model"
+	"github.com/ae-lexs/vinyl_store/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 var (
-	DBInstance *gorm.DB
-	err        error
+	err error
 )
 
-// Connects to the database and sets the DBInstance variable.
-func SetUpDatabase() {
+// Connects to the database and returns the database instance.
+func SetUp() *gorm.DB {
 	dsn := fmt.Sprintf(
 		"host=postgres user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Asia/Shanghai",
 		os.Getenv("DB_USER"),
@@ -32,13 +31,11 @@ func SetUpDatabase() {
 		panic("Failed to connect to the database.")
 	}
 
-	log.Println("Connected to the Dabase")
+	log.Println("Connected to the Database")
 
-	db.Logger = logger.Default.LogMode(logger.Info)
-
-	db.AutoMigrate(&model.Album{})
+	db.AutoMigrate(&entity.Album{})
 
 	log.Println("Models migrated")
 
-	DBInstance = db
+	return db
 }
