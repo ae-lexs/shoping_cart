@@ -2,37 +2,52 @@ package main
 
 import (
 	"log"
-	"reflect"
 
+	"github.com/ae-lexs/vinyl_store/adapter"
+	"github.com/ae-lexs/vinyl_store/database"
+	"github.com/ae-lexs/vinyl_store/handler"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-var (
-	logger = log.Default()
-)
-
-type Dependencies struct {
-	logger *log.Logger
+type Lambda struct {
+	logger             *log.Logger
+	createAlbumHandler handler.CreateAlbumHandlerInterface
 }
 
-// NewDependencies returns a Dependencies instance.
-func NewDependencies() *Dependencies {
-	return &Dependencies{
+// NewLambda returns a Lambda instance.
+func NewLambda() *Lambda {
+	logger := log.Default()
+	repository := adapter.NewAlbumRepository(
+		database.SetUp(),
+		logger,
+	)
+
+	return &Lambda{
 		logger: logger,
+		createAlbumHandler: handler.NewCreateAlbumHandler(
+			repository,
+			logger,
+		),
 	}
 }
 
-func (d *Dependencies) handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	d.logger.Printf("Body: %s", request.Body)
-	d.logger.Printf("Body: %s", reflect.TypeOf(request.Body))
+func (l *Lambda) lambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	response, err := l.createAlbumHandler.CreateAlbum(request.Body)
+
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       "InternalServerError",
+			StatusCode: 500,
+		}, nil
+	}
 
 	return events.APIGatewayProxyResponse{
-		Body:       "OK",
+		Body:       response,
 		StatusCode: 200,
 	}, nil
 }
 
 func main() {
-	lambda.Start(NewDependencies().handler)
+	lambda.Start(NewLambda().lambdaHandler)
 }

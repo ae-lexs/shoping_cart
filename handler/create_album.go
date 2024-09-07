@@ -8,7 +8,10 @@ import (
 	"github.com/ae-lexs/vinyl_store/entity"
 )
 
-// AlbumData represents the received album information.
+type CreateAlbumHandlerInterface interface {
+	CreateAlbum(data string) (string, error)
+}
+
 type AlbumData struct {
 	Title    string  `json:"title"`
 	Artist   string  `json:"artist"`
@@ -16,19 +19,16 @@ type AlbumData struct {
 	Quantity int     `json:"quantity"`
 }
 
-// Response represents the handler response.
 type Response struct {
-	ID    uint  `json:"id"`
-	Error error `json:"error"`
+	ID    uint   `json:"id"`
+	Error string `json:"error"`
 }
 
-// CreateAlbumHandler represents the CreateAlbum lambda handler.
 type CreateAlbumHandler struct {
 	repository adapter.AlbumRespositoryInterface
 	logger     *log.Logger
 }
 
-// NewCreateAlbumHandler returns a new instance of CreateAlbumHandler.
 func NewCreateAlbumHandler(repository adapter.AlbumRespositoryInterface, logger *log.Logger) *CreateAlbumHandler {
 	return &CreateAlbumHandler{
 		repository: repository,
@@ -36,17 +36,13 @@ func NewCreateAlbumHandler(repository adapter.AlbumRespositoryInterface, logger 
 	}
 }
 
-// CreateAlbum receives the album information and creates it in the database.
-func (h *CreateAlbumHandler) CreateAlbum(data []byte) Response {
+func (h *CreateAlbumHandler) CreateAlbum(data string) (string, error) {
 	var albumData = AlbumData{}
 
-	if err := json.Unmarshal(data, &albumData); err != nil {
+	if err := json.Unmarshal([]byte(data), &albumData); err != nil {
 		h.logger.Printf("InvalidJSONError: %s", err)
 
-		return Response{
-			ID:    0,
-			Error: entity.InvalidJSONError,
-		}
+		return h.parseResponse(0, entity.InvalidJSONError)
 	}
 
 	createdAlbum, err := h.repository.CreateAlbum(
@@ -57,14 +53,23 @@ func (h *CreateAlbumHandler) CreateAlbum(data []byte) Response {
 	)
 
 	if err != nil {
-		return Response{
-			ID:    0,
-			Error: err,
-		}
+		return h.parseResponse(0, entity.InvalidJSONError)
 	}
 
-	return Response{
-		ID:    createdAlbum.ID,
-		Error: nil,
+	return h.parseResponse(createdAlbum.ID, nil)
+}
+
+func (h *CreateAlbumHandler) parseResponse(albumID uint, err error) (string, error) {
+	response, responseError := json.Marshal(&Response{
+		ID:    albumID,
+		Error: err.Error(),
+	})
+
+	if responseError != nil {
+		h.logger.Printf("InvalidResponseStructError: %s", responseError)
+
+		return "", entity.InvalidResponseStructError
 	}
+
+	return string(response), nil
 }
