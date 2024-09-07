@@ -1,4 +1,4 @@
-package handler
+package service
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"github.com/ae-lexs/vinyl_store/entity"
 )
 
-type CreateAlbumHandlerInterface interface {
+type CreateAlbumInterface interface {
 	CreateAlbum(data string) (string, error)
 }
 
@@ -24,28 +24,28 @@ type Response struct {
 	Error string `json:"error"`
 }
 
-type CreateAlbumHandler struct {
+type CreateAlbum struct {
 	repository adapter.AlbumRespositoryInterface
 	logger     *log.Logger
 }
 
-func NewCreateAlbumHandler(repository adapter.AlbumRespositoryInterface, logger *log.Logger) *CreateAlbumHandler {
-	return &CreateAlbumHandler{
+func NewCreateAlbum(repository adapter.AlbumRespositoryInterface, logger *log.Logger) CreateAlbum {
+	return CreateAlbum{
 		repository: repository,
 		logger:     logger,
 	}
 }
 
-func (h *CreateAlbumHandler) CreateAlbum(data string) (string, error) {
+func (service *CreateAlbum) CreateAlbum(data string) (string, error) {
 	var albumData = AlbumData{}
 
 	if err := json.Unmarshal([]byte(data), &albumData); err != nil {
-		h.logger.Printf("InvalidJSONError: %s", err)
+		service.logger.Printf("InvalidJSONError: %s", err)
 
-		return h.parseResponse(0, entity.InvalidJSONError)
+		return service.parseResponse(0, entity.InvalidJSONError)
 	}
 
-	createdAlbum, err := h.repository.CreateAlbum(
+	createdAlbum, err := service.repository.CreateAlbum(
 		albumData.Title,
 		albumData.Artist,
 		albumData.Price,
@@ -53,20 +53,20 @@ func (h *CreateAlbumHandler) CreateAlbum(data string) (string, error) {
 	)
 
 	if err != nil {
-		return h.parseResponse(0, entity.InvalidJSONError)
+		return service.parseResponse(0, entity.InvalidJSONError)
 	}
 
-	return h.parseResponse(createdAlbum.ID, nil)
+	return service.parseResponse(createdAlbum.ID, nil)
 }
 
-func (h *CreateAlbumHandler) parseResponse(albumID uint, err error) (string, error) {
+func (service *CreateAlbum) parseResponse(albumID uint, err error) (string, error) {
 	response, responseError := json.Marshal(&Response{
 		ID:    albumID,
 		Error: err.Error(),
 	})
 
 	if responseError != nil {
-		h.logger.Printf("InvalidResponseStructError: %s", responseError)
+		service.logger.Printf("InvalidResponseStructError: %s", responseError)
 
 		return "", entity.InvalidResponseStructError
 	}

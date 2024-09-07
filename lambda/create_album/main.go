@@ -5,14 +5,14 @@ import (
 
 	"github.com/ae-lexs/vinyl_store/adapter"
 	"github.com/ae-lexs/vinyl_store/database"
-	"github.com/ae-lexs/vinyl_store/handler"
+	"github.com/ae-lexs/vinyl_store/service"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
 type Lambda struct {
-	logger             *log.Logger
-	createAlbumHandler handler.CreateAlbumHandlerInterface
+	logger  *log.Logger
+	service service.CreateAlbum
 }
 
 // NewLambda returns a Lambda instance.
@@ -25,15 +25,15 @@ func NewLambda() *Lambda {
 
 	return &Lambda{
 		logger: logger,
-		createAlbumHandler: handler.NewCreateAlbumHandler(
+		service: service.NewCreateAlbum(
 			repository,
 			logger,
 		),
 	}
 }
 
-func (l *Lambda) lambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	response, err := l.createAlbumHandler.CreateAlbum(request.Body)
+func (l *Lambda) handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	response, err := l.service.CreateAlbum(request.Body)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{
@@ -49,5 +49,5 @@ func (l *Lambda) lambdaHandler(request events.APIGatewayProxyRequest) (events.AP
 }
 
 func main() {
-	lambda.Start(NewLambda().lambdaHandler)
+	lambda.Start(NewLambda().handler)
 }

@@ -1,4 +1,4 @@
-package handler
+package service
 
 import (
 	"log"
@@ -16,7 +16,7 @@ func (r *albumRespositoryMock) CreateAlbum(title, artist string, price float32, 
 	return r.expectedAlbum, r.expectedRepositoryError
 }
 
-func TestCreateAlbumHandler(t *testing.T) {
+func TestCreateAlbumService(t *testing.T) {
 	testCases := []struct {
 		name                    string
 		expectedAlbum           entity.Album
@@ -68,7 +68,7 @@ func TestCreateAlbumHandler(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			handler := NewCreateAlbumHandler(
+			handler := NewCreateAlbum(
 				&albumRespositoryMock{
 					expectedAlbum:           entity.Album{},
 					expectedRepositoryError: nil,
