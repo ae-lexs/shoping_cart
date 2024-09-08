@@ -31,7 +31,7 @@ func NewDynamoDBClient() (*dynamodb.Client, error) {
 }
 
 type VinylsTableInterface interface {
-	CreateVinyl(vinyl VinylItem) error
+	Create(vinyl VinylItem) error
 	Get(vinylID string) (VinylItem, error)
 }
 
@@ -52,7 +52,7 @@ type VinylItem struct {
 	Price  float32 `dynamodbav:"price"`
 }
 
-func (adapter *VinylsDynamoTableAdapter) CreateVinyl(vinyl VinylItem) error {
+func (adapter *VinylsDynamoTableAdapter) Create(vinyl VinylItem) error {
 	data, err := attributevalue.MarshalMap(vinyl)
 
 	if err != nil {

@@ -12,8 +12,12 @@ type vinylsTableAdapterMock struct {
 	dynamoError error
 }
 
-func (adapter *vinylsTableAdapterMock) CreateVinyl(vinyl adapter.VinylItem) error {
-	return adapter.dynamoError
+func (a *vinylsTableAdapterMock) Create(vinyl adapter.VinylItem) error {
+	return a.dynamoError
+}
+
+func (a *vinylsTableAdapterMock) Get(vinylID string) (adapter.VinylItem, error) {
+	return adapter.VinylItem{}, a.dynamoError
 }
 
 func TestAlbumServiceCreate(t *testing.T) {
@@ -44,7 +48,7 @@ func TestAlbumServiceCreate(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		albumService := NewAlbum(&vinylsTableAdapterMock{
+		albumService := NewVinyl(&vinylsTableAdapterMock{
 			dynamoError: testCase.expectedAdapterError,
 		})
 

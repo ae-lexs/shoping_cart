@@ -12,7 +12,7 @@ import (
 
 type Lambda struct {
 	logger  *log.Logger
-	service service.AlbumInterface
+	service service.VinylInterface
 }
 
 func NewLambda() *Lambda {
@@ -25,7 +25,7 @@ func NewLambda() *Lambda {
 
 	return &Lambda{
 		logger: logger,
-		service: service.NewAlbum(
+		service: service.NewVinyl(
 			adapter.NewVinylsDynamoTableAdapter(dynamoClient),
 		),
 	}
