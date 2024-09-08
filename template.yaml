@@ -56,6 +56,25 @@ Resources:
             Path: /vinyl
             Method: GET
 
+  GetVinylsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: lambda/get_vinyls/
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures:
+      - x86_64
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Events:
+        CatchAll:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /vinyls
+            Method: GET
+
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -82,3 +101,6 @@ Outputs:
   GetVinylFunction:
     Description: GetVinylFunction ARN
     Value: !GetAtt GetVinylFunction.Arn
+  GetVinylsFunction:
+    Description: GetVinylsFunction ARN
+    Value: !GetAtt GetVinylsFunction.Arn

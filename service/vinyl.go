@@ -119,7 +119,7 @@ func (service *Vinyl) GetAll() (string, error) {
 	}
 
 	response := vinylsResponse{
-		vinyls: service.buildVinylsResponse(vinyls),
+		Vinyls: service.buildVinylsResponse(vinyls),
 	}
 	jsonResponse, err := json.Marshal(&response)
 

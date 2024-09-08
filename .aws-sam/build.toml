@@ -27,4 +27,17 @@ functions = ["GetVinylFunction"]
 [function_build_definitions.e3d41eab-2831-4bb0-aae4-bc2e031d2559.metadata]
 BuildMethod = "go1.x"
 
+[function_build_definitions.608089af-bd92-469c-a501-62e6c6d0f50d]
+codeuri = "/home/aelexs/Development/aelexs/vinyl_store/lambda/get_vinyls"
+runtime = "provided.al2023"
+architecture = "x86_64"
+handler = "bootstrap"
+source_hash = "9a29f8ba943900c4edfdac4d8965f61c36f548a664d88d76fc6e8ad0dae99c01"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["GetVinylsFunction"]
+
+[function_build_definitions.608089af-bd92-469c-a501-62e6c6d0f50d.metadata]
+BuildMethod = "go1.x"
+
 [layer_build_definitions]
