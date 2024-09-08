@@ -20,6 +20,10 @@ func (a *vinylsTableAdapterMock) Get(vinylID string) (adapter.VinylItem, error) 
 	return adapter.VinylItem{}, a.dynamoError
 }
 
+func (a *vinylsTableAdapterMock) GetAll() ([]adapter.VinylItem, error) {
+	return []adapter.VinylItem{}, a.dynamoError
+}
+
 func TestAlbumServiceCreate(t *testing.T) {
 	testCases := []struct {
 		name                 string
@@ -71,7 +75,7 @@ func TestAlbumServiceGet(t *testing.T) {
 		expectedError        error
 	}{
 		{
-			name:                 "GetsAlbum",
+			name:                 "GetsAlbums",
 			vinylID:              "4a7f6d57-c324-4854-bf0a-f77926fa5e6c",
 			expectedAdapterError: nil,
 			expectedError:        nil,
@@ -92,6 +96,40 @@ func TestAlbumServiceGet(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 
 			_, actualError := albumService.Get(testCase.vinylID)
+
+			if actualError != testCase.expectedError {
+				t.Errorf("Expected %v but got %v", testCase.expectedError, actualError)
+			}
+		})
+	}
+}
+
+func TestAlbumServiceGetAll(t *testing.T) {
+	testCases := []struct {
+		name                 string
+		expectedAdapterError error
+		expectedError        error
+	}{
+		{
+			name:                 "GetsAlbum",
+			expectedAdapterError: nil,
+			expectedError:        nil,
+		},
+		{
+			name:                 "VinylsTableAdapterError",
+			expectedAdapterError: errors.New("ANY_DYNAMO_ERROR"),
+			expectedError:        entity.VinylsTableAdapterError,
+		},
+	}
+
+	for _, testCase := range testCases {
+		albumService := NewVinyl(&vinylsTableAdapterMock{
+			dynamoError: testCase.expectedAdapterError,
+		})
+
+		t.Run(testCase.name, func(t *testing.T) {
+
+			_, actualError := albumService.GetAll()
 
 			if actualError != testCase.expectedError {
 				t.Errorf("Expected %v but got %v", testCase.expectedError, actualError)

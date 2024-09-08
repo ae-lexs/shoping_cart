@@ -12,6 +12,7 @@ import (
 type VinylInterface interface {
 	Create(string) (string, error)
 	Get(string) (string, error)
+	GetAll() (string, error)
 }
 
 type Vinyl struct {
@@ -39,6 +40,10 @@ type vinylResponse struct {
 	Title  string  `json:"title"`
 	Artist string  `json:"artist"`
 	Price  float32 `json:"price"`
+}
+
+type vinylsResponse struct {
+	Vinyls []vinylResponse `json:"vinyls"`
 }
 
 func (service *Vinyl) Create(bodyRequest string) (string, error) {
@@ -102,4 +107,43 @@ func (service *Vinyl) Get(vinylID string) (string, error) {
 	}
 
 	return string(jsonResponse), nil
+}
+
+func (service *Vinyl) GetAll() (string, error) {
+	vinyls, err := service.vinylsTableAdapter.GetAll()
+
+	if err != nil {
+		log.Printf("VinylsTableAdapterError: %s", err.Error())
+
+		return "", entity.VinylsTableAdapterError
+	}
+
+	response := vinylsResponse{
+		vinyls: service.buildVinylsResponse(vinyls),
+	}
+	jsonResponse, err := json.Marshal(&response)
+
+	if err != nil {
+		log.Printf("JSONMarshalError: %s", err.Error())
+
+		return "", entity.JSONMarshalError
+	}
+
+	return string(jsonResponse), nil
+}
+
+func (service *Vinyl) buildVinylsResponse(vinyls []adapter.VinylItem) []vinylResponse {
+	var vinylsResponses []vinylResponse
+
+	for _, vinyl := range vinyls {
+		vr := vinylResponse{
+			ID:     vinyl.ID,
+			Artist: vinyl.Artist,
+			Title:  vinyl.Title,
+			Price:  vinyl.Price,
+		}
+		vinylsResponses = append(vinylsResponses, vr)
+	}
+
+	return vinylsResponses
 }
