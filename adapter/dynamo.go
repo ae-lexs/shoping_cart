@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
@@ -31,6 +32,7 @@ func NewDynamoDBClient() (*dynamodb.Client, error) {
 
 type VinylsTableInterface interface {
 	CreateVinyl(vinyl VinylItem) error
+	Get(vinylID string) (VinylItem, error)
 }
 
 type VinylsDynamoTableAdapter struct {
@@ -71,4 +73,41 @@ func (adapter *VinylsDynamoTableAdapter) CreateVinyl(vinyl VinylItem) error {
 	}
 
 	return nil
+}
+
+func (adapter *VinylsDynamoTableAdapter) Get(vinylID string) (VinylItem, error) {
+	var vinyls []VinylItem
+	keyCondition := expression.Key("vinyl_id").Equal(expression.Value(vinylID))
+	expression, err := expression.NewBuilder().WithKeyCondition(keyCondition).Build()
+
+	if err != nil {
+		log.Printf("DynamoDBNewBuilderExpressionError: %s", err.Error())
+
+		return VinylItem{}, entity.DynamoDBNewBuilderExpressionError
+	}
+
+	data, err := adapter.dynamoDBClient.Query(context.TODO(), &dynamodb.QueryInput{
+		TableName:                 aws.String("VinylsTableName"),
+		ExpressionAttributeNames:  expression.Names(),
+		ExpressionAttributeValues: expression.Values(),
+		KeyConditionExpression:    expression.Filter(),
+	})
+
+	if err != nil {
+		log.Printf("DynamoDBQueryError: %s", err.Error())
+
+		return VinylItem{}, entity.DynamoDBQueryError
+	}
+
+	err = attributevalue.UnmarshalListOfMaps(data.Items, &vinyls)
+
+	if err != nil {
+		log.Printf("DynamoDBUnmarshalListOfMapsError: %s", err.Error())
+
+		return VinylItem{}, entity.DynamoDBUnmarshalListOfMapsError
+	}
+
+	log.Printf("Vinyls: %v", vinyls)
+
+	return vinyls[0], nil
 }
