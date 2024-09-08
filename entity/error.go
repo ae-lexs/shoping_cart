@@ -13,4 +13,5 @@ var (
 	DynamoDBQueryError                = errors.New("DynamoDBQueryError")
 	DynamoDBUnmarshalListOfMapsError  = errors.New("DynamoDBUnmarshalListOfMapsError")
 	VinylIDRequiredError              = errors.New("VinylIDRequiredError")
+	DynamoDBScanError                 = errors.New("DynamoDBScanError")
 )

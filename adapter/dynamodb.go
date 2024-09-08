@@ -31,8 +31,9 @@ func NewDynamoDBClient() (*dynamodb.Client, error) {
 }
 
 type VinylsTableInterface interface {
-	Create(vinyl VinylItem) error
-	Get(vinylID string) (VinylItem, error)
+	Create(VinylItem) error
+	Get(string) (VinylItem, error)
+	GetAll() ([]VinylItem, error)
 }
 
 type VinylsDynamoTableAdapter struct {
@@ -110,4 +111,28 @@ func (adapter *VinylsDynamoTableAdapter) Get(vinylID string) (VinylItem, error) 
 	log.Printf("Vinyls: %v", vinyls)
 
 	return vinyls[0], nil
+}
+
+func (adapter *VinylsDynamoTableAdapter) GetAll() ([]VinylItem, error) {
+	var vinyls []VinylItem
+
+	data, err := adapter.dynamoDBClient.Scan(context.TODO(), &dynamodb.ScanInput{
+		TableName: aws.String(VinylsTableName),
+	})
+
+	if err != nil {
+		log.Printf("DynamoDBScanError: %s", err.Error())
+
+		return vinyls, entity.DynamoDBScanError
+	}
+
+	err = attributevalue.UnmarshalListOfMaps(data.Items, &vinyls)
+
+	if err != nil {
+		log.Printf("DynamoDBUnmarshalListOfMapsError: %s", err.Error())
+
+		return vinyls, entity.DynamoDBUnmarshalListOfMapsError
+	}
+
+	return vinyls, nil
 }
