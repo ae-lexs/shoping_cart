@@ -34,9 +34,6 @@ Resources:
           Properties:
             Path: /album
             Method: POST
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-        Variables:
-          PARAM1: VALUE
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
@@ -61,6 +58,3 @@ Outputs:
   CreateAlbumFunction:
     Description: CreateAlbumFunction ARN
     Value: !GetAtt CreateAlbumFunction.Arn
-  # CreateAlbumFunctionIamRole:
-  #   Description: Implicit IAM Role created for Create Album function
-  #   Value: !GetAtt CreateAlbumFunctionIamRole.Arn

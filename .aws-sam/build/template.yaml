@@ -32,9 +32,6 @@ Resources:
           Properties:
             Path: /album
             Method: POST
-      Environment:
-        Variables:
-          PARAM1: VALUE
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:

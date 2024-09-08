@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/ae-lexs/vinyl_store/adapter"
-	"github.com/ae-lexs/vinyl_store/database"
 	"github.com/ae-lexs/vinyl_store/service"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -12,28 +10,21 @@ import (
 
 type Lambda struct {
 	logger  *log.Logger
-	service service.CreateAlbum
+	service service.AlbumInterface
 }
 
 // NewLambda returns a Lambda instance.
 func NewLambda() *Lambda {
 	logger := log.Default()
-	repository := adapter.NewAlbumRepository(
-		database.SetUp(),
-		logger,
-	)
 
 	return &Lambda{
-		logger: logger,
-		service: service.NewCreateAlbum(
-			repository,
-			logger,
-		),
+		logger:  logger,
+		service: service.NewAlbum(),
 	}
 }
 
 func (l *Lambda) handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	response, err := l.service.CreateAlbum(request.Body)
+	response, err := l.service.Create(request.Body)
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{
