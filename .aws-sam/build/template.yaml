@@ -15,13 +15,13 @@ Globals:
   Api:
     TracingEnabled: true
 Resources:
-  CreateAlbumFunction:
+  CreateVinylFunction:
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: go1.x
-      SamResourceId: CreateAlbumFunction
+      SamResourceId: CreateVinylFunction
     Properties:
-      CodeUri: CreateAlbumFunction
+      CodeUri: CreateVinylFunction
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures:
@@ -32,7 +32,7 @@ Resources:
         CatchAll:
           Type: Api
           Properties:
-            Path: /album
+            Path: /vinyl
             Method: POST
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
@@ -51,10 +51,10 @@ Outputs:
   AlbumAPI:
     Description: API Gateway endpoint URL for Prod environment for First Function
     Value:
-      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/album/
-  CreateAlbumFunction:
-    Description: CreateAlbumFunction ARN
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/vinyl/
+  CreateVinylFunction:
+    Description: CreateVinylFunction ARN
     Value:
       Fn::GetAtt:
-      - CreateAlbumFunction
+      - CreateVinylFunction
       - Arn
