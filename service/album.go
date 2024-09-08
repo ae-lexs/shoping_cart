@@ -1,15 +1,24 @@
 package service
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"log"
+
+	"github.com/ae-lexs/vinyl_store/entity"
+)
 
 type AlbumInterface interface {
 	Create(string) (string, error)
 }
 
-type Album struct{}
+type Album struct {
+	logger *log.Logger
+}
 
-func NewAlbum() *Album {
-	return &Album{}
+func NewAlbum(logger *log.Logger) *Album {
+	return &Album{
+		logger: logger,
+	}
 }
 
 type albumDataRquest struct {
@@ -22,7 +31,9 @@ func (a *Album) Create(bodyRequest string) (string, error) {
 	albumData := albumDataRquest{}
 
 	if err := json.Unmarshal([]byte(bodyRequest), &albumData); err != nil {
-		return "", err
+		a.logger.Printf("JSONUnmarshalError: %v", err.Error())
+
+		return "", entity.JSONUnmarshalError
 	}
 
 	return "", nil

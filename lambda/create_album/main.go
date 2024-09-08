@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/ae-lexs/vinyl_store/entity"
 	"github.com/ae-lexs/vinyl_store/service"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,13 +19,22 @@ func NewLambda() *Lambda {
 	logger := log.Default()
 
 	return &Lambda{
-		logger:  logger,
-		service: service.NewAlbum(),
+		logger: logger,
+		service: service.NewAlbum(
+			logger,
+		),
 	}
 }
 
 func (l *Lambda) handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	response, err := l.service.Create(request.Body)
+
+	if err == entity.JSONUnmarshalError {
+		return events.APIGatewayProxyResponse{
+			Body:       "BadRequest",
+			StatusCode: 400,
+		}, nil
+	}
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{
