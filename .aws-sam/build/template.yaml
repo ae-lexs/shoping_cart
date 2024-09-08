@@ -26,6 +26,8 @@ Resources:
       Runtime: provided.al2023
       Architectures:
       - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
       Events:
         CatchAll:
           Type: Api
