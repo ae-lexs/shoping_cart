@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/ae-lexs/vinyl_store/adapter"
 	"github.com/ae-lexs/vinyl_store/entity"
 	"github.com/ae-lexs/vinyl_store/service"
 	"github.com/aws/aws-lambda-go/events"
@@ -14,14 +15,18 @@ type Lambda struct {
 	service service.AlbumInterface
 }
 
-// NewLambda returns a Lambda instance.
 func NewLambda() *Lambda {
 	logger := log.Default()
+	dynamoClient, err := adapter.NewDynamoDBClient()
+
+	if err != nil {
+		panic(err)
+	}
 
 	return &Lambda{
 		logger: logger,
 		service: service.NewAlbum(
-			logger,
+			adapter.NewVinylsDynamoTableAdapter(dynamoClient),
 		),
 	}
 }
@@ -31,14 +36,14 @@ func (l *Lambda) handler(request events.APIGatewayProxyRequest) (events.APIGatew
 
 	if err == entity.JSONUnmarshalError {
 		return events.APIGatewayProxyResponse{
-			Body:       "BadRequest",
+			Body:       err.Error(),
 			StatusCode: 400,
 		}, nil
 	}
 
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			Body:       "InternalServerError",
+			Body:       err.Error(),
 			StatusCode: 500,
 		}, nil
 	}
