@@ -62,3 +62,40 @@ func TestAlbumServiceCreate(t *testing.T) {
 		})
 	}
 }
+
+func TestAlbumServiceGet(t *testing.T) {
+	testCases := []struct {
+		name                 string
+		vinylID              string
+		expectedAdapterError error
+		expectedError        error
+	}{
+		{
+			name:                 "GetsAlbum",
+			vinylID:              "4a7f6d57-c324-4854-bf0a-f77926fa5e6c",
+			expectedAdapterError: nil,
+			expectedError:        nil,
+		},
+		{
+			name:                 "VinylsTableAdapterError",
+			vinylID:              "4a7f6d57-c324-4854-bf0a-f77926fa5e6c",
+			expectedAdapterError: errors.New("ANY_DYNAMO_ERROR"),
+			expectedError:        entity.VinylsTableAdapterError,
+		},
+	}
+
+	for _, testCase := range testCases {
+		albumService := NewVinyl(&vinylsTableAdapterMock{
+			dynamoError: testCase.expectedAdapterError,
+		})
+
+		t.Run(testCase.name, func(t *testing.T) {
+
+			_, actualError := albumService.Get(testCase.vinylID)
+
+			if actualError != testCase.expectedError {
+				t.Errorf("Expected %v but got %v", testCase.expectedError, actualError)
+			}
+		})
+	}
+}
