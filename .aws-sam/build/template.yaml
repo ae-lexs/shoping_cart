@@ -34,6 +34,25 @@ Resources:
           Properties:
             Path: /vinyl
             Method: POST
+  GetVinylFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+      SamResourceId: GetVinylFunction
+    Properties:
+      CodeUri: GetVinylFunction
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures:
+      - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /vinyl
+            Method: GET
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -57,4 +76,10 @@ Outputs:
     Value:
       Fn::GetAtt:
       - CreateVinylFunction
+      - Arn
+  GetVinylFunction:
+    Description: GetVinylFunction ARN
+    Value:
+      Fn::GetAtt:
+      - GetVinylFunction
       - Arn

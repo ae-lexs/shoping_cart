@@ -2,12 +2,12 @@ module github.com/ae-lexs/vinyl_store
 
 go 1.23
 
-require github.com/aws/aws-lambda-go v1.47.0
-
 require (
-	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.22.7 // indirect
-	github.com/google/uuid v1.6.0 // indirect
+	github.com/aws/aws-lambda-go v1.47.0
+	github.com/google/uuid v1.6.0
 )
+
+require github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.22.7 // indirect
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.30.5
