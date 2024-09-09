@@ -14,5 +14,11 @@
 ### Get Album
 
 ```sh
- curl https://xysxevsifj.execute-api.us-east-2.amazonaws.com/Prod/vinyl/4a7f6d57-c324-4854-bf0a-f77926fa5e6c
+ curl https://xysxevsifj.execute-api.us-east-2.amazonaws.com/Prod/vinyl?id=4a7f6d57-c324-4854-bf0a-f77926fa5e6c
+```
+
+### Get Albums
+
+```sh
+ curl https://xysxevsifj.execute-api.us-east-2.amazonaws.com/Prod/vinyls
 ```

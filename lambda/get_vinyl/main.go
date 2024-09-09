@@ -32,9 +32,7 @@ func NewLambda() *Lambda {
 }
 
 func (l *Lambda) handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	vinylID := request.QueryStringParameters["id"]
-
-	log.Printf("vinylID: %v", vinylID)
+	vinylID := request.PathParameters["id"]
 
 	if vinylID == "" {
 		return events.APIGatewayProxyResponse{

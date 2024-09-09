@@ -32,7 +32,7 @@ func NewDynamoDBClient() (*dynamodb.Client, error) {
 
 type VinylsTableInterface interface {
 	Create(VinylItem) error
-	Get(string) (VinylItem, error)
+	Get(string) ([]VinylItem, error)
 	GetAll() ([]VinylItem, error)
 }
 
@@ -76,7 +76,7 @@ func (adapter *VinylsDynamoTableAdapter) Create(vinyl VinylItem) error {
 	return nil
 }
 
-func (adapter *VinylsDynamoTableAdapter) Get(vinylID string) (VinylItem, error) {
+func (adapter *VinylsDynamoTableAdapter) Get(vinylID string) ([]VinylItem, error) {
 	var vinyls []VinylItem
 	keyCondition := expression.Key("vinyl_id").Equal(expression.Value(vinylID))
 	expression, err := expression.NewBuilder().WithKeyCondition(keyCondition).Build()
@@ -84,20 +84,20 @@ func (adapter *VinylsDynamoTableAdapter) Get(vinylID string) (VinylItem, error) 
 	if err != nil {
 		log.Printf("DynamoDBNewBuilderExpressionError: %s", err.Error())
 
-		return VinylItem{}, entity.DynamoDBNewBuilderExpressionError
+		return vinyls, entity.DynamoDBNewBuilderExpressionError
 	}
 
 	data, err := adapter.dynamoDBClient.Query(context.TODO(), &dynamodb.QueryInput{
-		TableName:                 aws.String("VinylsTableName"),
+		TableName:                 aws.String(VinylsTableName),
 		ExpressionAttributeNames:  expression.Names(),
 		ExpressionAttributeValues: expression.Values(),
-		KeyConditionExpression:    expression.Filter(),
+		KeyConditionExpression:    expression.KeyCondition(),
 	})
 
 	if err != nil {
 		log.Printf("DynamoDBQueryError: %s", err.Error())
 
-		return VinylItem{}, entity.DynamoDBQueryError
+		return vinyls, entity.DynamoDBQueryError
 	}
 
 	err = attributevalue.UnmarshalListOfMaps(data.Items, &vinyls)
@@ -105,12 +105,10 @@ func (adapter *VinylsDynamoTableAdapter) Get(vinylID string) (VinylItem, error) 
 	if err != nil {
 		log.Printf("DynamoDBUnmarshalListOfMapsError: %s", err.Error())
 
-		return VinylItem{}, entity.DynamoDBUnmarshalListOfMapsError
+		return vinyls, entity.DynamoDBUnmarshalListOfMapsError
 	}
 
-	log.Printf("Vinyls: %v", vinyls)
-
-	return vinyls[0], nil
+	return vinyls, nil
 }
 
 func (adapter *VinylsDynamoTableAdapter) GetAll() ([]VinylItem, error) {

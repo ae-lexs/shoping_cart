@@ -84,7 +84,7 @@ func (service *Vinyl) Create(bodyRequest string) (string, error) {
 }
 
 func (service *Vinyl) Get(vinylID string) (string, error) {
-	vinyl, err := service.vinylsTableAdapter.Get(vinylID)
+	vinyls, err := service.vinylsTableAdapter.Get(vinylID)
 
 	if err != nil {
 		log.Printf("VinylsTableAdapterError: %s", err.Error())
@@ -92,11 +92,17 @@ func (service *Vinyl) Get(vinylID string) (string, error) {
 		return "", entity.VinylsTableAdapterError
 	}
 
+	if len(vinyls) < 1 {
+		log.Printf("VinylNotFoudError: %s", vinylID)
+
+		return "", entity.VinylNotFoudError
+	}
+
 	response := vinylResponse{
-		ID:     vinyl.ID,
-		Title:  vinyl.Title,
-		Artist: vinyl.Artist,
-		Price:  vinyl.Price,
+		ID:     vinyls[0].ID,
+		Title:  vinyls[0].Title,
+		Artist: vinyls[0].Artist,
+		Price:  vinyls[0].Price,
 	}
 	jsonResponse, err := json.Marshal(&response)
 

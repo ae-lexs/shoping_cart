@@ -51,7 +51,7 @@ Resources:
         CatchAll:
           Type: Api
           Properties:
-            Path: /vinyl
+            Path: /vinyl/{id}
             Method: GET
   GetVinylsFunction:
     Type: AWS::Serverless::Function
@@ -70,7 +70,7 @@ Resources:
         CatchAll:
           Type: Api
           Properties:
-            Path: /vinyls
+            Path: /vinyl
             Method: GET
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
